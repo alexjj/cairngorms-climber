@@ -11,7 +11,7 @@ with open(file, 'r') as json_file:
     activations_summary = json.load(json_file)
 
 # Title of the app
-st.title("SOTA Awards Summary")
+st.title("Cairngorm Climbers' Award Summary")
 
 # Text input for filtering callsigns
 search_term = st.text_input("Search Callsign:")
@@ -20,7 +20,7 @@ search_term = st.text_input("Search Callsign:")
 filtered_data = filter_callsigns(activations_summary, search_term)
 
 # Display the table
-st.subheader("Callsign Summary")
+st.subheader("Honour roll")
 st.dataframe(filtered_data[['Callsign', 'SummitsActivated', 'Award', 'AwardDate']])
 
 # Select a callsign to view remaining summits
