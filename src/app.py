@@ -3,10 +3,12 @@ import pandas as pd
 import json
 import folium
 from streamlit_folium import st_folium
-from utils import load_data, filter_callsigns, get_remaining_summits
+from utils import filter_callsigns, get_remaining_summits
 
 # Load data
-activations_summary = load_data('sota_awards_summary.json')
+file = 'sota_awards_summary.json'
+with open(file, 'r') as json_file:
+    activations_summary = json.load(json_file)
 
 # Title of the app
 st.title("SOTA Awards Summary")

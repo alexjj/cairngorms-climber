@@ -1,7 +1,3 @@
-def load_data(file):
-    with open(file, 'r') as json_file:
-        return json.load(json_file)
-
 def filter_callsigns(data, search_term):
     # Function to filter callsigns based on the search term
     return [entry for entry in data if search_term.lower() in entry['Callsign'].lower()]
