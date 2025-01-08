@@ -1,4 +1,4 @@
-def fetch_data():
+def load_data():
     # Function to fetch data from the JSON file
     import json
     with open('sota_awards_summary.json', 'r') as json_file:
