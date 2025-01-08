@@ -31,7 +31,41 @@ st.markdown('''The GM/ES SOTA Society wish to recognise those radio amateurs who
 
 There are 82 SOTA summits in the Cairngorms National Park, including several of the highest peaks in the UK. The SOTA summits are split across the regions with 44 in ES, 36 in CS, and 2 in WS.''')
 
-st.markdown('''The awards are:
+st.subheader("Cairngorm Summits")
+
+# Cairngorms summit map
+
+summits_df = pd.read_csv('cairngorms_summits.csv')
+cairngorms_geojson = load_data("cairngorms.geojson")
+map_center = [57.07, -3.7]
+my_map = folium.Map(location=map_center, zoom_start=8)
+
+folium.GeoJson(
+    cairngorms_geojson,
+    name="Cairngorms"
+).add_to(my_map)
+
+# Iterate through the summits in combined_df
+for index, row in summits_df.iterrows():
+    latitude = row['latitude']
+    longitude = row['longitude']
+
+    popup = f"""<b>{row['name']}</b><br><a href="https://sotl.as/summits/{row['summitCode']}" target="_blank">{row['summitCode']}</a><br>Points: {row['points']}"""
+
+    tooltip = row['name']
+
+    tooltip = f"<b>{row['name']}</b><br>Points: {row['points']}"
+    folium.Marker(
+        location=[latitude, longitude],
+        popup=popup,
+        tooltip=tooltip,
+        icon=folium.Icon(color="lightgreen" if row["points"] == 1 else "green" if row["points"] ==2 else "darkgreen" if row["points"] == 4 else "orange" if row["points"] == 6 else "darkred" if row["points"] == 8 else "red")
+    ).add_to(my_map)
+
+st_folium(my_map, width=700, height=500)
+
+st.subheader("Award Definitions")
+st.markdown('''
 
 |         Award          | Number of Summits Activated |
 |:----------------------:|:---------------------------:|
@@ -46,7 +80,6 @@ st.markdown("Calculated daily, the awards are presented below. You can select yo
 
 # Load and display table
 data = load_data("sota_awards_summary.json")
-cairngorms_geojson = load_data("cairngorms.geojson")
 df = process_data(data)
 df_display = df.drop(columns=["RemainingSummits"]).sort_values(by="Total Summits Activated", ascending=False)
 df_sorted = df.sort_values(by="Operator").reset_index(drop=True)
@@ -67,7 +100,8 @@ selected_row = st.dataframe(
     df_display.style.set_properties(**{'text-align': 'left'}),
     use_container_width=True,
     hide_index=True,
-    column_config=column_config
+    column_config=column_config,
+    selection_mode="single-row"
 )
 
 # Create dropdown sorted alphabetically by Operator
