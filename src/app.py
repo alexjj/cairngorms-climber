@@ -3,7 +3,6 @@ import pandas as pd
 import json
 import folium
 from streamlit_folium import st_folium
-from dateutil import parser
 
 # Load JSON data
 def load_data(file_path):
@@ -41,10 +40,9 @@ st.markdown('''The awards are:
 | Capercaillie Conqueror |             10              |
 |    Osprey Outlander    |             41              |
 | Golden Eagle Explorer  |             82              |
+''')
 
-            ''')
 st.markdown("Calculated daily, the awards are presented below. You can select your callsign from the dropdown to see which summits you still need to activate to achieve the Golden Eagle Explorer 🦅🥇")
-
 
 # Load and display table
 data = load_data("sota_awards_summary.json")
