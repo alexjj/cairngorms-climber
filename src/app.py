@@ -26,7 +26,7 @@ selected_callsign = st.selectbox("Select a Callsign:", filtered_data['Callsign']
 
 if selected_callsign:
     remaining_summits = get_remaining_summits(activations_summary, selected_callsign)
-    
+
     # Create a map for remaining summits
     map_center = [55.0, -4.0]  # Center of the map (adjust as necessary)
     summit_map = folium.Map(location=map_center, zoom_start=8)

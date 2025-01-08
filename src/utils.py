@@ -1,7 +1,5 @@
-def load_data():
-    # Function to fetch data from the JSON file
-    import json
-    with open('sota_awards_summary.json', 'r') as json_file:
+def load_data(file):
+    with open(file, 'r') as json_file:
         return json.load(json_file)
 
 def filter_callsigns(data, search_term):
