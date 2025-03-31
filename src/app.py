@@ -103,7 +103,6 @@ selected_row = st.dataframe(
     column_config=column_config,
     selection_mode="single-row"
 )
-st.caption("The date is wrong...investigating...")
 
 # Create dropdown sorted alphabetically by Operator
 selected_index = st.selectbox(
