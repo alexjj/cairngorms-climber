@@ -25,6 +25,14 @@ def fetch_activations(summit_code):
         print(f"Failed to fetch data for {summit_code}: {response.status_code}")
         return []
 
+def fetch_callsign(userId):
+    url = f"https://sotl.as/api/activators/{userId}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json().get('callsign')
+    return None
+
+
 # Collect activation data
 activation_data = []
 
@@ -77,12 +85,12 @@ activations_summary['AwardDate'] = activations_summary.apply(
     lambda row: get_award_date(row['UserId'], row['SummitsActivated']), axis=1
 )
 
-# Replace UserId with the most frequent Callsign
+# Replace UserId with the most frequent Callsign - NOT USED
 def get_most_frequent_callsign(user_id):
     user_activations = activations_df[activations_df['UserId'] == user_id]
     return user_activations['Callsign'].mode()[0]
 
-activations_summary['Callsign'] = activations_summary['UserId'].apply(get_most_frequent_callsign)
+activations_summary['Callsign'] = activations_summary['UserId'].apply(fetch_callsign)
 
 # Determine remaining summits for each userId
 def get_remaining_summits(user_id):
