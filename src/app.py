@@ -139,7 +139,7 @@ if selected_index is not None:
         ).add_to(m)
 
     st.subheader(f"Remaining Summits for {df_sorted.iloc[selected_index]['Operator']}")
-    st_folium(m, width=700, height=500)
+    st_folium(m, width=700, height=700, returned_objects=[])
 
     # Display remaining summits in a table
     remaining_summits_table = pd.DataFrame([
