@@ -29,7 +29,7 @@ st.title("🏔️Cairngorms Climbers' Award🏆")
 
 st.markdown('''The GM/ES SOTA Society wish to recognise those radio amateurs who venture into the remote lands of the Cairngorms, and have created awards for summits activated within the Cairngorms National Park.
 
-There are 82 SOTA summits in the Cairngorms National Park, including several of the highest peaks in the UK. The SOTA summits are split across the regions with 44 in ES, 36 in CS, and 2 in WS.''')
+There are 89 SOTA summits in the Cairngorms National Park, including several of the highest peaks in the UK. The SOTA summits are split across the regions with 46 in ES, 40 in CS, and 3 in WS.''')
 
 st.subheader("Cairngorm Summits")
 
@@ -72,8 +72,8 @@ st.markdown('''
 |     Heather Hopper     |              1              |
 |   Ptarmigan Pioneer    |              5              |
 | Capercaillie Conqueror |             10              |
-|    Osprey Outlander    |             41              |
-| Golden Eagle Explorer  |             82              |
+|    Osprey Outlander    |             45              |
+| Golden Eagle Explorer  |             89              |
 ''')
 
 st.markdown("Calculated daily, the awards are presented below. You can select your callsign from the dropdown to see which summits you still need to activate to achieve the Golden Eagle Explorer 🦅🥇")
@@ -103,7 +103,6 @@ selected_row = st.dataframe(
     column_config=column_config,
     selection_mode="single-row"
 )
-st.caption("The date is wrong...investigating...")
 
 # Create dropdown sorted alphabetically by Operator
 selected_index = st.selectbox(
