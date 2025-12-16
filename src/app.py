@@ -16,9 +16,10 @@ def process_data(data):
     for entry in data:
         rows.append({
             "Operator": entry["Callsign"],
-            "Total Summits Activated": int(entry["SummitsActivated"]),
-            "Highest Award Achieved": entry["Award"],
-            "Date of Award": entry["AwardDate"],
+            "Total Summits Activated": entry["SummitsActivated"],
+            "First CNP Activation": entry["FirstActivationDate"],
+            "Last CNP Activation": entry["LastActivationDate"],
+            "Activation Span (days)": entry["ActivationSpanDays"],
             "RemainingSummits": entry["RemainingSummits"]
         })
     return pd.DataFrame(rows)
@@ -27,7 +28,7 @@ def process_data(data):
 st.set_page_config(page_title="Cairngorms Climbers' Award", page_icon=":sports_medal:", layout="centered", initial_sidebar_state="auto", menu_items=None)
 st.title("🏔️Cairngorms Climbers' Award🏆")
 
-st.markdown('''The GM/ES SOTA Society wish to recognise those radio amateurs who venture into the remote lands of the Cairngorms, and have created awards for summits activated within the Cairngorms National Park.
+st.markdown('''The GM/ES SOTA Society wish to recognise those radio amateurs who venture into the remote lands of the Cairngorms, and have created this site to see the activations within the Cairngorms National Park.
 
 There are 89 SOTA summits in the Cairngorms National Park, including several of the highest peaks in the UK. The SOTA summits are split across the regions with 46 in ES, 40 in CS, and 3 in WS.''')
 
@@ -64,20 +65,6 @@ for index, row in summits_df.iterrows():
 
 st_folium(my_map, width=700, height=500)
 
-st.subheader("Award Definitions")
-st.markdown('''
-
-|         Award          | Number of Summits Activated |
-|:----------------------:|:---------------------------:|
-|     Heather Hopper     |              1              |
-|   Ptarmigan Pioneer    |              5              |
-| Capercaillie Conqueror |             10              |
-|    Osprey Outlander    |             45              |
-| Golden Eagle Explorer  |             89              |
-''')
-
-st.markdown("Calculated daily, the awards are presented below. You can select your callsign from the dropdown to see which summits you still need to activate to achieve the Golden Eagle Explorer 🦅🥇")
-
 # Load and display table
 data = load_data("sota_awards_summary.json")
 df = process_data(data)
@@ -88,10 +75,13 @@ df_sorted = df.sort_values(by="Operator").reset_index(drop=True)
 column_config = {
     "Operator": st.column_config.TextColumn("Operator"),
     "Total Summits Activated": st.column_config.NumberColumn("Total Summits Activated"),
-    "Highest Award Achieved": st.column_config.TextColumn("Highest Award Achieved"),
-    "Date of Award": st.column_config.DatetimeColumn(
-        "Date of Award", format="Do MMM YYYY"
-    )
+    "First CNP Activation": st.column_config.DatetimeColumn(
+        "First CNP Activation", format="Do MMM YYYY"
+    ),
+    "Last CNP Activation": st.column_config.DatetimeColumn(
+        "Last CNP Activation", format="Do MMM YYYY"
+    ),
+    "Activation Span (days)": st.column_config.NumberColumn("Activation Span (days)")
 }
 
 # Display sortable and searchable table
@@ -149,5 +139,11 @@ if selected_index is not None:
         }
         for summit in remaining_summits
     ])
+    st.markdown(
+        f"**{df_sorted.iloc[selected_index]['Operator']}** has activated "
+        f"{df_sorted.iloc[selected_index]['Total Summits Activated']} summits "
+        f"between **{df_sorted.iloc[selected_index]['First CNP Activation']}** "
+        f"and **{df_sorted.iloc[selected_index]['Last CNP Activation']}**."
+    )
     st.subheader(f"List of the {len(remaining_summits)} remaining summits:")
     st.dataframe(remaining_summits_table, hide_index=True)

@@ -1,11 +1,3 @@
-# Golden Eagle Explorer - all summits
-# Osprey Outlander - 50%
-# Capercaillie Conqueror - 10
-# Ptarmigan Pioneer - 5
-# Heather Hopper - 1 summit
-
-# Activations - https://api-db2.sota.org.uk/api/activations/GM/ES-001
-
 import pandas as pd
 import requests
 import json
@@ -48,48 +40,24 @@ for summit_code in summit_codes:
 
 # Create DataFrame from activation data
 activations_df = pd.DataFrame(activation_data)
+activations_df['ActivationDate'] = pd.to_datetime(activations_df['ActivationDate'])
 
-# Count the number of summits activated by each callsign
-activations_summary = activations_df.groupby('UserId')['summitCode'].nunique().reset_index()
-activations_summary.columns = ['UserId', 'SummitsActivated']
-
-# Add awards based on activation counts
-def assign_awards(row):
-    if row['SummitsActivated'] >= 1 and row['SummitsActivated'] < 5:
-        return 'Heather Hopper'
-    elif row['SummitsActivated'] >= 5 and row['SummitsActivated'] < 10:
-        return 'Ptarmigan Pioneer'
-    elif row['SummitsActivated'] >= 10 and row['SummitsActivated'] < len(summit_codes) * 0.5:
-        return 'Capercaillie Conqueror'
-    elif row['SummitsActivated'] >= len(summit_codes) * 0.5 and row['SummitsActivated'] < len(summit_codes):
-        return 'Osprey Outlander'
-    elif row['SummitsActivated'] == len(summit_codes):
-        return 'Golden Eagle Explorer'
-    else:
-        return None
-
-activations_summary['Award'] = activations_summary.apply(assign_awards, axis=1)
-
-# Determine the date each callsign achieved their award
-def get_award_date(user_id, required_summits):
-    activations = activations_df[activations_df['UserId'] == user_id]
-    activations = activations.sort_values('ActivationDate', ascending=False)
-    unique_summits = set()
-    for _, row in activations.iterrows():
-        unique_summits.add(row['summitCode'])
-        if len(unique_summits) >= required_summits:
-            return row['ActivationDate']
-    return None
-
-activations_summary['AwardDate'] = activations_summary.apply(
-    lambda row: get_award_date(row['UserId'], row['SummitsActivated']), axis=1
+# Aggregate per user
+activations_summary = (
+    activations_df
+    .groupby('UserId')
+    .agg(
+        SummitsActivated=('summitCode', 'nunique'),
+        FirstActivationDate=('ActivationDate', 'min'),
+        LastActivationDate=('ActivationDate', 'max')
+    )
+    .reset_index()
 )
 
-# Replace UserId with the most frequent Callsign - NOT USED
-def get_most_frequent_callsign(user_id):
-    user_activations = activations_df[activations_df['UserId'] == user_id]
-    return user_activations['Callsign'].mode()[0]
-
+activations_summary['ActivationSpanDays'] = (
+    activations_summary['LastActivationDate'] -
+    activations_summary['FirstActivationDate']
+).dt.days
 activations_summary['Callsign'] = activations_summary['UserId'].apply(fetch_callsign)
 
 # Determine remaining summits for each userId
@@ -115,11 +83,12 @@ for user_id in activations_summary['UserId']:
     callsign = user_data['Callsign']
     output_data.append({
         'Callsign': callsign,
-        'SummitsActivated': user_data['SummitsActivated'],
-        'Award': user_data['Award'],
-        'AwardDate': user_data['AwardDate'],
+        'SummitsActivated': int(user_data['SummitsActivated']),
+        'FirstActivationDate': user_data['FirstActivationDate'],
+        'LastActivationDate': user_data['LastActivationDate'],
+        'ActivationSpanDays': int(user_data['ActivationSpanDays']),
         'RemainingSummits': get_remaining_summits(user_id)
-    })
+})
 
 # Save to JSON
 with open('sota_awards_summary.json', 'w') as json_file:
