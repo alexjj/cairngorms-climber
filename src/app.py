@@ -68,7 +68,16 @@ st_folium(my_map, width=700, height=500)
 # Load and display table
 data = load_data("sota_awards_summary.json")
 df = process_data(data)
-df_display = df.drop(columns=["RemainingSummits"]).sort_values(by="Total Summits Activated", ascending=False)
+df_display = (
+    df
+    .drop(columns=["RemainingSummits"])
+    .sort_values(
+        by=["Total Summits Activated", "Activation Span (days)"],
+        ascending=[False, True]
+    )
+    .reset_index(drop=True)
+)
+
 df_sorted = df.sort_values(by="Operator").reset_index(drop=True)
 
 # Configure column formats
